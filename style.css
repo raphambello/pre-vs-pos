@@ -83,6 +83,40 @@ main.wrap {
   gap: 16px;
 }
 
+.produto-fieldset {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 16px 4px;
+  margin: 0 0 18px;
+}
+
+.produto-fieldset legend {
+  padding: 0 6px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.legend-hint {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.82rem;
+}
+
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel-alt);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
 label {
   display: block;
   font-size: 0.88rem;

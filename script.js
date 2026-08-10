@@ -41,7 +41,8 @@ function simular() {
   const cdiAnual = parseFloat(document.getElementById("cdi").value) / 100;
   const percentualCdi = parseFloat(document.getElementById("percentualCdi").value) / 100;
   const prefixadoAnual = parseFloat(document.getElementById("prefixado").value) / 100;
-  const considerarIR = document.getElementById("considerarIR").checked;
+  const posIsento = document.getElementById("posTributacao").value === "isento";
+  const preIsento = document.getElementById("preTributacao").value === "isento";
 
   const taxaPosAnual = cdiAnual * percentualCdi;
   const taxaPreAnual = prefixadoAnual;
@@ -60,11 +61,14 @@ function simular() {
   const preBruto = preSerie[prazoMeses];
 
   const dias = prazoMeses * 30;
-  const aliquota = considerarIR ? aliquotaIR(dias) : 0;
+  const aliquotaPos = posIsento ? 0 : aliquotaIR(dias);
+  const aliquotaPre = preIsento ? 0 : aliquotaIR(dias);
 
-  const posLiquido = valor + (posBruto - valor) * (1 - aliquota);
-  const preLiquido = valor + (preBruto - valor) * (1 - aliquota);
+  const posLiquido = valor + (posBruto - valor) * (1 - aliquotaPos);
+  const preLiquido = valor + (preBruto - valor) * (1 - aliquotaPre);
 
+  document.getElementById("posLabel").textContent = `Pós-fixado (CDI) — ${posIsento ? "isento de IR" : "tributável"}`;
+  document.getElementById("preLabel").textContent = `Prefixado — ${preIsento ? "isento de IR" : "tributável"}`;
   document.getElementById("posBruto").textContent = `Bruto: ${formatBRL(posBruto)}`;
   document.getElementById("preBruto").textContent = `Bruto: ${formatBRL(preBruto)}`;
   document.getElementById("posLiquido").textContent = formatBRL(posLiquido);
