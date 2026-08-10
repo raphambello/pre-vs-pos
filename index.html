@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pré vs Pós — Simulador de Renda Fixa</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%93%88</text></svg>" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <h1>Pré <span class="vs">vs</span> Pós</h1>
+      <p class="subtitle">Simulador de investimentos em renda fixa: prefixado x pós-fixado (CDI)</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel form-panel">
+      <h2>Parâmetros da simulação</h2>
+      <form id="form-simulacao">
+        <div class="field">
+          <label for="valor">Valor investido (R$)</label>
+          <input type="number" id="valor" min="0" step="100" value="10000" required />
+        </div>
+
+        <div class="field">
+          <label for="prazo">Prazo (meses)</label>
+          <input type="number" id="prazo" min="1" max="360" step="1" value="24" required />
+        </div>
+
+        <fieldset class="produto-fieldset">
+          <legend>Pós-fixado <span class="legend-hint">(ex: CDB, LCI, LCA)</span></legend>
+          <div class="field-group">
+            <div class="field">
+              <label for="cdi">Taxa CDI projetada (% a.a.)</label>
+              <input type="number" id="cdi" min="0" step="0.01" value="10.65" required />
+            </div>
+            <div class="field">
+              <label for="percentualCdi">% do CDI</label>
+              <input type="number" id="percentualCdi" min="0" step="1" value="100" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="posTributacao">Tributação</label>
+            <select id="posTributacao">
+              <option value="tributavel">Tributável — tabela regressiva de IR (ex: CDB, Tesouro)</option>
+              <option value="isento">Isento de IR (ex: LCI, LCA, CRI, CRA)</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="produto-fieldset">
+          <legend>Prefixado <span class="legend-hint">(ex: CDB, LCI, LCA)</span></legend>
+          <div class="field">
+            <label for="prefixado">Taxa prefixado (% a.a.)</label>
+            <input type="number" id="prefixado" min="0" step="0.01" value="11.5" required />
+          </div>
+          <div class="field">
+            <label for="preTributacao">Tributação</label>
+            <select id="preTributacao">
+              <option value="tributavel">Tributável — tabela regressiva de IR (ex: CDB, Tesouro)</option>
+              <option value="isento">Isento de IR (ex: LCI, LCA, CRI, CRA)</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <button type="submit" class="btn-primary">Simular</button>
+      </form>
+    </section>
+
+    <section class="panel results-panel" id="resultados" hidden>
+      <h2>Resultado da simulação</h2>
+
+      <div class="cards">
+        <div class="card card-pos">
+          <span class="card-label" id="posLabel">Pós-fixado (CDI)</span>
+          <strong class="card-value" id="posLiquido">—</strong>
+          <span class="card-sub" id="posBruto">—</span>
+        </div>
+        <div class="card card-pre">
+          <span class="card-label" id="preLabel">Prefixado</span>
+          <strong class="card-value" id="preLiquido">—</strong>
+          <span class="card-sub" id="preBruto">—</span>
+        </div>
+      </div>
+
+      <p class="veredito" id="veredito"></p>
+
+      <div class="chart-container">
+        <canvas id="chart" width="800" height="360"></canvas>
+        <div class="legend">
+          <span class="legend-item"><i class="dot dot-pos"></i>Pós-fixado (CDI)</span>
+          <span class="legend-item"><i class="dot dot-pre"></i>Prefixado</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel mtm-panel" id="mtm-panel" hidden>
+      <h2>Risco de marcação a mercado</h2>
+      <p class="mtm-intro">
+        O prefixado é um título "zero cupom": seu preço até o vencimento acompanha a curva de juros contratada.
+        Se você precisar vender antes do prazo e a taxa de juros de mercado tiver mudado, o preço do título se
+        reprecifica — podendo gerar ágio ou deságio. Já o pós-fixado (CDI) tem preço de mercado muito mais estável,
+        pois acompanha o indexador diariamente.
+      </p>
+
+      <div class="field slider-field">
+        <label for="novaTaxa">
+          Se você vendesse hoje, a nova taxa de mercado para o prazo restante seria:
+          <strong id="novaTaxaValor">11.50% a.a.</strong>
+        </label>
+        <input type="range" id="novaTaxa" min="0" max="25" step="0.1" value="11.5" />
+      </div>
+
+      <div class="field">
+        <label for="momentoVenda">Tempo decorrido até a venda antecipada (meses)</label>
+        <input type="number" id="momentoVenda" min="1" step="1" value="12" />
+      </div>
+
+      <div class="mtm-result" id="mtm-result"></div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <p>Simulação com fins educativos. Não considera taxas de custódia/administração, IOF em resgates com menos de 30 dias, nem garante rentabilidade futura.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
