@@ -11,7 +11,7 @@
   <header class="topbar">
     <div class="wrap">
       <h1>Pré <span class="vs">vs</span> Pós</h1>
-      <p class="subtitle">Simulador de investimentos em renda fixa: prefixado x pós-fixado (CDI)</p>
+      <p class="subtitle">Simulador de investimentos em renda fixa: prefixado x pós-fixado (CDI) x poupança</p>
     </div>
   </header>
 
@@ -65,6 +65,24 @@
           </div>
         </fieldset>
 
+        <fieldset class="produto-fieldset">
+          <legend>Poupança</legend>
+          <div class="field-group">
+            <div class="field">
+              <label for="selic">Taxa Selic projetada (% a.a.)</label>
+              <input type="number" id="selic" min="0" step="0.01" value="11" required />
+            </div>
+            <div class="field">
+              <label for="tr">TR (% a.m.)</label>
+              <input type="number" id="tr" min="0" step="0.0001" value="0" required />
+            </div>
+          </div>
+          <p class="field-hint">
+            Sempre isenta de IR. Regra vigente: 0,5% a.m. + TR quando a Selic é maior que 8,5% a.a.;
+            caso contrário, 70% da Selic + TR.
+          </p>
+        </fieldset>
+
         <button type="submit" class="btn-primary">Simular</button>
       </form>
     </section>
@@ -83,17 +101,31 @@
           <strong class="card-value" id="preLiquido">—</strong>
           <span class="card-sub" id="preBruto">—</span>
         </div>
+        <div class="card card-poup">
+          <span class="card-label">Poupança</span>
+          <strong class="card-value" id="poupLiquido">—</strong>
+          <span class="card-sub">Sempre isenta de IR</span>
+        </div>
       </div>
 
       <p class="veredito" id="veredito"></p>
+
+      <div class="destaque-poupanca" id="destaquePoupanca"></div>
 
       <div class="chart-container">
         <canvas id="chart" width="800" height="360"></canvas>
         <div class="legend">
           <span class="legend-item"><i class="dot dot-pos"></i>Pós-fixado (CDI)</span>
           <span class="legend-item"><i class="dot dot-pre"></i>Prefixado</span>
+          <span class="legend-item"><i class="dot dot-poup"></i>Poupança</span>
         </div>
       </div>
+
+      <p class="aviso-poupanca">
+        ⚠ Na poupança, o rendimento só é creditado na data de aniversário mensal do depósito.
+        Resgates antes de completar o ciclo de 30 dias perdem 100% do rendimento daquele período —
+        um risco de liquidez que os outros produtos simulados aqui normalmente não têm.
+      </p>
     </section>
 
     <section class="panel mtm-panel" id="mtm-panel" hidden>

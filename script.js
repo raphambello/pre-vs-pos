@@ -17,6 +17,13 @@ function taxaMensalEquivalente(taxaAnual) {
   return Math.pow(1 + taxaAnual, 1 / 12) - 1;
 }
 
+function taxaPoupancaMensal(selicAnual, trMensal) {
+  if (selicAnual > 0.085) {
+    return 0.005 + trMensal;
+  }
+  return taxaMensalEquivalente(selicAnual) * 0.7 + trMensal;
+}
+
 function formatBRL(valor) {
   return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
@@ -43,22 +50,28 @@ function simular() {
   const prefixadoAnual = parseFloat(document.getElementById("prefixado").value) / 100;
   const posIsento = document.getElementById("posTributacao").value === "isento";
   const preIsento = document.getElementById("preTributacao").value === "isento";
+  const selicAnual = parseFloat(document.getElementById("selic").value) / 100;
+  const trMensal = parseFloat(document.getElementById("tr").value) / 100;
 
   const taxaPosAnual = cdiAnual * percentualCdi;
   const taxaPreAnual = prefixadoAnual;
+  const taxaPoupMensal = taxaPoupancaMensal(selicAnual, trMensal);
 
   const taxaPosMensal = taxaMensalEquivalente(taxaPosAnual);
   const taxaPreMensal = taxaMensalEquivalente(taxaPreAnual);
 
   const posSerie = [];
   const preSerie = [];
+  const poupSerie = [];
   for (let m = 0; m <= prazoMeses; m++) {
     posSerie.push(valor * Math.pow(1 + taxaPosMensal, m));
     preSerie.push(valor * Math.pow(1 + taxaPreMensal, m));
+    poupSerie.push(valor * Math.pow(1 + taxaPoupMensal, m));
   }
 
   const posBruto = posSerie[prazoMeses];
   const preBruto = preSerie[prazoMeses];
+  const poupLiquido = poupSerie[prazoMeses];
 
   const dias = prazoMeses * 30;
   const aliquotaPos = posIsento ? 0 : aliquotaIR(dias);
@@ -73,18 +86,30 @@ function simular() {
   document.getElementById("preBruto").textContent = `Bruto: ${formatBRL(preBruto)}`;
   document.getElementById("posLiquido").textContent = formatBRL(posLiquido);
   document.getElementById("preLiquido").textContent = formatBRL(preLiquido);
+  document.getElementById("poupLiquido").textContent = formatBRL(poupLiquido);
 
   const diferenca = preLiquido - posLiquido;
   const veredito = document.getElementById("veredito");
   if (Math.abs(diferenca) < 0.01) {
-    veredito.textContent = "As duas opções resultam em rentabilidade líquida praticamente idêntica.";
+    veredito.textContent = "Prefixado e pós-fixado resultam em rentabilidade líquida praticamente idêntica entre si.";
   } else if (diferenca > 0) {
-    veredito.textContent = `Nessas condições, o prefixado rende ${formatBRL(diferenca)} a mais (líquido) que o pós-fixado ao final do prazo.`;
+    veredito.textContent = `Entre as duas alternativas, o prefixado rende ${formatBRL(diferenca)} a mais (líquido) que o pós-fixado ao final do prazo.`;
   } else {
-    veredito.textContent = `Nessas condições, o pós-fixado rende ${formatBRL(-diferenca)} a mais (líquido) que o prefixado ao final do prazo.`;
+    veredito.textContent = `Entre as duas alternativas, o pós-fixado rende ${formatBRL(-diferenca)} a mais (líquido) que o prefixado ao final do prazo.`;
   }
 
-  desenharGrafico(posSerie, preSerie);
+  const melhorAlternativa = Math.max(posLiquido, preLiquido);
+  const nomeMelhorAlternativa = melhorAlternativa === preLiquido ? "prefixado" : "pós-fixado";
+  const diferencaVsPoupanca = melhorAlternativa - poupLiquido;
+  const percentualVsPoupanca = (diferencaVsPoupanca / valor) * 100;
+  const destaquePoupanca = document.getElementById("destaquePoupanca");
+  if (diferencaVsPoupanca > 0.01) {
+    destaquePoupanca.innerHTML = `💡 Sair da poupança para o <strong>${nomeMelhorAlternativa}</strong> rende <strong>${formatBRL(diferencaVsPoupanca)} a mais</strong> (líquido) nesse prazo — ${formatPct(percentualVsPoupanca)} a mais sobre o valor investido, só pela escolha do investimento.`;
+  } else {
+    destaquePoupanca.innerHTML = `Nessas condições específicas, a poupança rende ${formatBRL(-diferencaVsPoupanca)} a mais que a melhor alternativa simulada — revise as taxas informadas.`;
+  }
+
+  desenharGrafico(posSerie, preSerie, poupSerie);
 
   ultimaSimulacao = { valor, prazoMeses, taxaPreAnual };
 
@@ -99,7 +124,7 @@ function simular() {
   atualizarMarcacaoMercado();
 }
 
-function desenharGrafico(posSerie, preSerie) {
+function desenharGrafico(posSerie, preSerie, poupSerie) {
   const canvas = document.getElementById("chart");
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
@@ -108,7 +133,7 @@ function desenharGrafico(posSerie, preSerie) {
 
   ctx.clearRect(0, 0, w, h);
 
-  const todos = posSerie.concat(preSerie);
+  const todos = posSerie.concat(preSerie, poupSerie);
   const min = Math.min(...todos);
   const max = Math.max(...todos);
   const range = max - min || 1;
@@ -149,6 +174,7 @@ function desenharGrafico(posSerie, preSerie) {
 
   desenharLinha(posSerie, "#35c3a1");
   desenharLinha(preSerie, "#f0a84e");
+  desenharLinha(poupSerie, "#e2685f");
 }
 
 function atualizarMarcacaoMercado() {

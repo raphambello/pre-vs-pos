@@ -1,6 +1,6 @@
 # pre-vs-pos
 
-Simulador de investimentos em renda fixa que compara **prefixado x pós-fixado (CDI)**.
+Simulador de investimentos em renda fixa que compara **prefixado x pós-fixado (CDI) x poupança**.
 
 ## O que ele faz
 
@@ -9,7 +9,11 @@ Simulador de investimentos em renda fixa que compara **prefixado x pós-fixado (
 - Cada lado (pré e pós) tem sua própria tributação configurável — **tributável** (tabela
   regressiva de IR, ex: CDB, Tesouro) ou **isento de IR** (ex: LCI, LCA, CRI, CRA) — permitindo
   comparar produtos diferentes entre si, como um CDB pós-fixado com uma LCI prefixada.
-- Mostra um gráfico de evolução do valor investido ao longo do tempo para as duas opções.
+- Inclui a **poupança** como terceira opção, aplicando a regra vigente (0,5% a.m. + TR quando a
+  Selic é maior que 8,5% a.a., senão 70% da Selic + TR), sempre isenta de IR. Um destaque calcula
+  quanto a melhor alternativa simulada rende a mais do que a poupança — útil para argumentar a
+  favor de tirar dinheiro da poupança.
+- Mostra um gráfico de evolução do valor investido ao longo do tempo para as três opções.
 - Traz uma seção de **risco de marcação a mercado**: simula o que acontece com o preço do
   título prefixado (zero cupom) caso você precise vendê-lo antes do vencimento e a taxa de
   juros de mercado tenha mudado, comparando com o valor "pela curva" contratado.
