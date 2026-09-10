@@ -7,6 +7,7 @@
   --text-muted: #94a3b5;
   --accent-pos: #35c3a1;
   --accent-pre: #f0a84e;
+  --accent-poup: #e2685f;
   --accent-primary: #4f8cff;
   --radius: 12px;
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
@@ -102,6 +103,12 @@ main.wrap {
   font-size: 0.82rem;
 }
 
+.field-hint {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: -8px 0 14px;
+}
+
 select {
   width: 100%;
   padding: 10px 12px;
@@ -172,7 +179,7 @@ input[type="checkbox"] {
 
 .cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -191,6 +198,10 @@ input[type="checkbox"] {
 
 .card-pre {
   border-top-color: var(--accent-pre);
+}
+
+.card-poup {
+  border-top-color: var(--accent-poup);
 }
 
 .card-label {
@@ -219,6 +230,25 @@ input[type="checkbox"] {
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 0.95rem;
+}
+
+.destaque-poupanca {
+  margin-top: 12px;
+  background: rgba(226, 104, 95, 0.1);
+  border: 1px solid var(--accent-poup);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+}
+
+.destaque-poupanca strong {
+  color: var(--accent-poup);
+}
+
+.aviso-poupanca {
+  margin: 16px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
 }
 
 .chart-container {
@@ -261,6 +291,10 @@ canvas {
 
 .dot-pre {
   background: var(--accent-pre);
+}
+
+.dot-poup {
+  background: var(--accent-poup);
 }
 
 .mtm-intro {
