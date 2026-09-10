@@ -17,6 +17,12 @@ function taxaMensalEquivalente(taxaAnual) {
   return Math.pow(1 + taxaAnual, 1 / 12) - 1;
 }
 
+function parseNumero(id) {
+  const bruto = document.getElementById(id).value.trim().replace(",", ".");
+  const numero = parseFloat(bruto);
+  return Number.isFinite(numero) ? numero : 0;
+}
+
 function taxaPoupancaMensal(selicAnual, trMensal) {
   if (selicAnual > 0.085) {
     return 0.005 + trMensal;
@@ -45,13 +51,13 @@ document.getElementById("momentoVenda").addEventListener("input", atualizarMarca
 function simular() {
   const valor = parseFloat(document.getElementById("valor").value);
   const prazoMeses = parseInt(document.getElementById("prazo").value, 10);
-  const cdiAnual = parseFloat(document.getElementById("cdi").value) / 100;
-  const percentualCdi = parseFloat(document.getElementById("percentualCdi").value) / 100;
-  const prefixadoAnual = parseFloat(document.getElementById("prefixado").value) / 100;
+  const cdiAnual = parseNumero("cdi") / 100;
+  const percentualCdi = parseNumero("percentualCdi") / 100;
+  const prefixadoAnual = parseNumero("prefixado") / 100;
   const posIsento = document.getElementById("posTributacao").value === "isento";
   const preIsento = document.getElementById("preTributacao").value === "isento";
-  const selicAnual = parseFloat(document.getElementById("selic").value) / 100;
-  const trMensal = parseFloat(document.getElementById("tr").value) / 100;
+  const selicAnual = parseNumero("selic") / 100;
+  const trMensal = parseNumero("tr") / 100;
 
   const taxaPosAnual = cdiAnual * percentualCdi;
   const taxaPreAnual = prefixadoAnual;
