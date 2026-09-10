@@ -1,4 +1,4 @@
-# pre-vs-pos
+# Comparador de Ativos
 
 Simulador de investimentos em renda fixa que compara **prefixado x pós-fixado (CDI) x poupança**.
 

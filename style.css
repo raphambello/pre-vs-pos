@@ -46,12 +46,6 @@ body {
   letter-spacing: -0.02em;
 }
 
-.topbar .vs {
-  color: var(--text-muted);
-  font-weight: 400;
-  font-size: 1.4rem;
-}
-
 .subtitle {
   margin: 6px 0 0;
   color: var(--text-muted);
