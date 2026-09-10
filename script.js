@@ -23,6 +23,10 @@ function parseNumero(id) {
   return Number.isFinite(numero) ? numero : 0;
 }
 
+function campoVazio(id) {
+  return document.getElementById(id).value.trim() === "";
+}
+
 function taxaPoupancaMensal(selicAnual, trMensal) {
   if (selicAnual > 0.085) {
     return 0.005 + trMensal;
@@ -51,86 +55,130 @@ document.getElementById("momentoVenda").addEventListener("input", atualizarMarca
 function simular() {
   const valor = parseFloat(document.getElementById("valor").value);
   const prazoMeses = parseInt(document.getElementById("prazo").value, 10);
-  const cdiAnual = parseNumero("cdi") / 100;
-  const percentualCdi = parseNumero("percentualCdi") / 100;
-  const prefixadoAnual = parseNumero("prefixado") / 100;
-  const posIsento = document.getElementById("posTributacao").value === "isento";
-  const preIsento = document.getElementById("preTributacao").value === "isento";
-  const selicAnual = parseNumero("selic") / 100;
-  const trMensal = parseNumero("tr") / 100;
-
-  const taxaPosAnual = cdiAnual * percentualCdi;
-  const taxaPreAnual = prefixadoAnual;
-  const taxaPoupMensal = taxaPoupancaMensal(selicAnual, trMensal);
-
-  const taxaPosMensal = taxaMensalEquivalente(taxaPosAnual);
-  const taxaPreMensal = taxaMensalEquivalente(taxaPreAnual);
-
-  const posSerie = [];
-  const preSerie = [];
-  const poupSerie = [];
-  for (let m = 0; m <= prazoMeses; m++) {
-    posSerie.push(valor * Math.pow(1 + taxaPosMensal, m));
-    preSerie.push(valor * Math.pow(1 + taxaPreMensal, m));
-    poupSerie.push(valor * Math.pow(1 + taxaPoupMensal, m));
-  }
-
-  const posBruto = posSerie[prazoMeses];
-  const preBruto = preSerie[prazoMeses];
-  const poupLiquido = poupSerie[prazoMeses];
-
   const dias = prazoMeses * 30;
-  const aliquotaPos = posIsento ? 0 : aliquotaIR(dias);
-  const aliquotaPre = preIsento ? 0 : aliquotaIR(dias);
 
-  const posLiquido = valor + (posBruto - valor) * (1 - aliquotaPos);
-  const preLiquido = valor + (preBruto - valor) * (1 - aliquotaPre);
+  const posAtivo = !campoVazio("cdi");
+  const preAtivo = !campoVazio("prefixado");
+  const poupAtivo = !campoVazio("selic");
 
-  document.getElementById("posLabel").textContent = `Pós-fixado (CDI) — ${posIsento ? "isento de IR" : "tributável"}`;
-  document.getElementById("preLabel").textContent = `Prefixado — ${preIsento ? "isento de IR" : "tributável"}`;
-  document.getElementById("posBruto").textContent = `Bruto: ${formatBRL(posBruto)}`;
-  document.getElementById("preBruto").textContent = `Bruto: ${formatBRL(preBruto)}`;
-  document.getElementById("posLiquido").textContent = formatBRL(posLiquido);
-  document.getElementById("preLiquido").textContent = formatBRL(preLiquido);
-  document.getElementById("poupLiquido").textContent = formatBRL(poupLiquido);
+  let posLiquido = null;
+  let preLiquido = null;
+  let poupLiquido = null;
+  let posSerie = null;
+  let preSerie = null;
+  let poupSerie = null;
+  let taxaPreAnual = null;
 
-  const diferenca = preLiquido - posLiquido;
+  if (posAtivo) {
+    const cdiAnual = parseNumero("cdi") / 100;
+    const percentualCdi = parseNumero("percentualCdi") / 100;
+    const posIsento = document.getElementById("posTributacao").value === "isento";
+    const taxaPosMensal = taxaMensalEquivalente(cdiAnual * percentualCdi);
+
+    posSerie = [];
+    for (let m = 0; m <= prazoMeses; m++) posSerie.push(valor * Math.pow(1 + taxaPosMensal, m));
+
+    const posBruto = posSerie[prazoMeses];
+    const aliquotaPos = posIsento ? 0 : aliquotaIR(dias);
+    posLiquido = valor + (posBruto - valor) * (1 - aliquotaPos);
+
+    document.getElementById("posLabel").textContent = `Pós-fixado (CDI) — ${posIsento ? "isento de IR" : "tributável"}`;
+    document.getElementById("posBruto").textContent = `Bruto: ${formatBRL(posBruto)}`;
+    document.getElementById("posLiquido").textContent = formatBRL(posLiquido);
+  }
+  document.getElementById("cardPos").hidden = !posAtivo;
+  document.getElementById("legendPos").hidden = !posAtivo;
+
+  if (preAtivo) {
+    taxaPreAnual = parseNumero("prefixado") / 100;
+    const preIsento = document.getElementById("preTributacao").value === "isento";
+    const taxaPreMensal = taxaMensalEquivalente(taxaPreAnual);
+
+    preSerie = [];
+    for (let m = 0; m <= prazoMeses; m++) preSerie.push(valor * Math.pow(1 + taxaPreMensal, m));
+
+    const preBruto = preSerie[prazoMeses];
+    const aliquotaPre = preIsento ? 0 : aliquotaIR(dias);
+    preLiquido = valor + (preBruto - valor) * (1 - aliquotaPre);
+
+    document.getElementById("preLabel").textContent = `Prefixado — ${preIsento ? "isento de IR" : "tributável"}`;
+    document.getElementById("preBruto").textContent = `Bruto: ${formatBRL(preBruto)}`;
+    document.getElementById("preLiquido").textContent = formatBRL(preLiquido);
+  }
+  document.getElementById("cardPre").hidden = !preAtivo;
+  document.getElementById("legendPre").hidden = !preAtivo;
+
+  if (poupAtivo) {
+    const selicAnual = parseNumero("selic") / 100;
+    const trMensal = parseNumero("tr") / 100;
+    const taxaPoupMensal = taxaPoupancaMensal(selicAnual, trMensal);
+
+    poupSerie = [];
+    for (let m = 0; m <= prazoMeses; m++) poupSerie.push(valor * Math.pow(1 + taxaPoupMensal, m));
+
+    poupLiquido = poupSerie[prazoMeses];
+    document.getElementById("poupLiquido").textContent = formatBRL(poupLiquido);
+  }
+  document.getElementById("cardPoup").hidden = !poupAtivo;
+  document.getElementById("legendPoup").hidden = !poupAtivo;
+  document.getElementById("avisoPoupanca").hidden = !poupAtivo;
+
   const veredito = document.getElementById("veredito");
-  if (Math.abs(diferenca) < 0.01) {
-    veredito.textContent = "Prefixado e pós-fixado resultam em rentabilidade líquida praticamente idêntica entre si.";
-  } else if (diferenca > 0) {
-    veredito.textContent = `Entre as duas alternativas, o prefixado rende ${formatBRL(diferenca)} a mais (líquido) que o pós-fixado ao final do prazo.`;
+  if (posAtivo && preAtivo) {
+    const diferenca = preLiquido - posLiquido;
+    if (Math.abs(diferenca) < 0.01) {
+      veredito.textContent = "Prefixado e pós-fixado resultam em rentabilidade líquida praticamente idêntica entre si.";
+    } else if (diferenca > 0) {
+      veredito.textContent = `Entre as duas alternativas, o prefixado rende ${formatBRL(diferenca)} a mais (líquido) que o pós-fixado ao final do prazo.`;
+    } else {
+      veredito.textContent = `Entre as duas alternativas, o pós-fixado rende ${formatBRL(-diferenca)} a mais (líquido) que o prefixado ao final do prazo.`;
+    }
+    veredito.hidden = false;
   } else {
-    veredito.textContent = `Entre as duas alternativas, o pós-fixado rende ${formatBRL(-diferenca)} a mais (líquido) que o prefixado ao final do prazo.`;
+    veredito.hidden = true;
   }
 
-  const melhorAlternativa = Math.max(posLiquido, preLiquido);
-  const nomeMelhorAlternativa = melhorAlternativa === preLiquido ? "prefixado" : "pós-fixado";
-  const diferencaVsPoupanca = melhorAlternativa - poupLiquido;
-  const percentualVsPoupanca = (diferencaVsPoupanca / valor) * 100;
+  const candidatos = [];
+  if (posAtivo) candidatos.push({ nome: "pós-fixado", valor: posLiquido });
+  if (preAtivo) candidatos.push({ nome: "prefixado", valor: preLiquido });
+
   const destaquePoupanca = document.getElementById("destaquePoupanca");
-  if (diferencaVsPoupanca > 0.01) {
-    destaquePoupanca.innerHTML = `💡 Sair da poupança para o <strong>${nomeMelhorAlternativa}</strong> rende <strong>${formatBRL(diferencaVsPoupanca)} a mais</strong> (líquido) nesse prazo — ${formatPct(percentualVsPoupanca)} a mais sobre o valor investido, só pela escolha do investimento.`;
+  if (poupAtivo && candidatos.length > 0) {
+    const melhor = candidatos.reduce((a, b) => (b.valor > a.valor ? b : a));
+    const diferencaVsPoupanca = melhor.valor - poupLiquido;
+    const percentualVsPoupanca = (diferencaVsPoupanca / valor) * 100;
+    if (diferencaVsPoupanca > 0.01) {
+      destaquePoupanca.innerHTML = `💡 Sair da poupança para o <strong>${melhor.nome}</strong> rende <strong>${formatBRL(diferencaVsPoupanca)} a mais</strong> (líquido) nesse prazo — ${formatPct(percentualVsPoupanca)} a mais sobre o valor investido, só pela escolha do investimento.`;
+    } else {
+      destaquePoupanca.innerHTML = `Nessas condições específicas, a poupança rende ${formatBRL(-diferencaVsPoupanca)} a mais que a melhor alternativa simulada — revise as taxas informadas.`;
+    }
+    destaquePoupanca.hidden = false;
   } else {
-    destaquePoupanca.innerHTML = `Nessas condições específicas, a poupança rende ${formatBRL(-diferencaVsPoupanca)} a mais que a melhor alternativa simulada — revise as taxas informadas.`;
+    destaquePoupanca.hidden = true;
   }
 
-  desenharGrafico(posSerie, preSerie, poupSerie);
-
-  ultimaSimulacao = { valor, prazoMeses, taxaPreAnual };
-
-  resultados.hidden = false;
-  mtmPanel.hidden = false;
-
-  const momentoVenda = document.getElementById("momentoVenda");
-  momentoVenda.max = Math.max(1, prazoMeses - 1);
-  if (parseInt(momentoVenda.value, 10) > momentoVenda.max) {
-    momentoVenda.value = momentoVenda.max;
+  const algumAtivo = posAtivo || preAtivo || poupAtivo;
+  document.getElementById("chartContainer").hidden = !algumAtivo;
+  if (algumAtivo) {
+    desenharGrafico({ posSerie, preSerie, poupSerie }, prazoMeses);
   }
-  atualizarMarcacaoMercado();
+
+  ultimaSimulacao = preAtivo ? { valor, prazoMeses, taxaPreAnual } : null;
+
+  resultados.hidden = !algumAtivo;
+  mtmPanel.hidden = !preAtivo;
+
+  if (preAtivo) {
+    const momentoVenda = document.getElementById("momentoVenda");
+    momentoVenda.max = Math.max(1, prazoMeses - 1);
+    if (parseInt(momentoVenda.value, 10) > momentoVenda.max) {
+      momentoVenda.value = momentoVenda.max;
+    }
+    atualizarMarcacaoMercado();
+  }
 }
 
-function desenharGrafico(posSerie, preSerie, poupSerie) {
+function desenharGrafico(series, prazoMeses) {
   const canvas = document.getElementById("chart");
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
@@ -139,7 +187,13 @@ function desenharGrafico(posSerie, preSerie, poupSerie) {
 
   ctx.clearRect(0, 0, w, h);
 
-  const todos = posSerie.concat(preSerie, poupSerie);
+  const ativos = [
+    { serie: series.posSerie, cor: "#35c3a1" },
+    { serie: series.preSerie, cor: "#f0a84e" },
+    { serie: series.poupSerie, cor: "#e2685f" },
+  ].filter((s) => s.serie);
+
+  const todos = ativos.flatMap((s) => s.serie);
   const min = Math.min(...todos);
   const max = Math.max(...todos);
   const range = max - min || 1;
@@ -147,7 +201,7 @@ function desenharGrafico(posSerie, preSerie, poupSerie) {
   const plotW = w - padding.left - padding.right;
   const plotH = h - padding.top - padding.bottom;
 
-  const x = (i) => padding.left + (i / (posSerie.length - 1)) * plotW;
+  const x = (i) => padding.left + (i / prazoMeses) * plotW;
   const y = (v) => padding.top + plotH - ((v - min) / range) * plotH;
 
   ctx.strokeStyle = "#2a3646";
@@ -178,9 +232,7 @@ function desenharGrafico(posSerie, preSerie, poupSerie) {
     ctx.stroke();
   }
 
-  desenharLinha(posSerie, "#35c3a1");
-  desenharLinha(preSerie, "#f0a84e");
-  desenharLinha(poupSerie, "#e2685f");
+  ativos.forEach((s) => desenharLinha(s.serie, s.cor));
 }
 
 function atualizarMarcacaoMercado() {

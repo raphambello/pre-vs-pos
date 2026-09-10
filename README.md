@@ -14,6 +14,9 @@ Simulador de investimentos em renda fixa que compara **prefixado x pós-fixado (
   quanto a melhor alternativa simulada rende a mais do que a poupança — útil para argumentar a
   favor de tirar dinheiro da poupança.
 - Mostra um gráfico de evolução do valor investido ao longo do tempo para as três opções.
+- Cada produto é opcional: deixando a taxa de rentabilidade (Taxa CDI, Taxa prefixado ou Taxa
+  Selic) em branco, o card, a linha no gráfico e a legenda daquele produto somem da comparação —
+  útil para simular só um subconjunto (ex: apenas prefixado x poupança).
 - Traz uma seção de **risco de marcação a mercado**: simula o que acontece com o preço do
   título prefixado (zero cupom) caso você precise vendê-lo antes do vencimento e a taxa de
   juros de mercado tenha mudado, comparando com o valor "pela curva" contratado.

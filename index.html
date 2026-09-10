@@ -34,11 +34,11 @@
           <div class="field-group">
             <div class="field">
               <label for="cdi">Taxa CDI projetada (% a.a.)</label>
-              <input type="text" inputmode="decimal" id="cdi" value="10,65" required />
+              <input type="text" inputmode="decimal" id="cdi" value="10,65" />
             </div>
             <div class="field">
               <label for="percentualCdi">% do CDI</label>
-              <input type="text" inputmode="decimal" id="percentualCdi" value="100" required />
+              <input type="text" inputmode="decimal" id="percentualCdi" value="100" />
             </div>
           </div>
           <div class="field">
@@ -54,7 +54,7 @@
           <legend>Prefixado <span class="legend-hint">(ex: CDB, LCI, LCA)</span></legend>
           <div class="field">
             <label for="prefixado">Taxa prefixado (% a.a.)</label>
-            <input type="text" inputmode="decimal" id="prefixado" value="11,5" required />
+            <input type="text" inputmode="decimal" id="prefixado" value="11,5" />
           </div>
           <div class="field">
             <label for="preTributacao">Tributação</label>
@@ -70,11 +70,11 @@
           <div class="field-group">
             <div class="field">
               <label for="selic">Taxa Selic projetada (% a.a.)</label>
-              <input type="text" inputmode="decimal" id="selic" value="11" required />
+              <input type="text" inputmode="decimal" id="selic" value="11" />
             </div>
             <div class="field">
               <label for="tr">TR (% a.m.)</label>
-              <input type="text" inputmode="decimal" id="tr" value="0" required />
+              <input type="text" inputmode="decimal" id="tr" value="0" />
             </div>
           </div>
           <p class="field-hint">
@@ -82,6 +82,8 @@
             caso contrário, 70% da Selic + TR.
           </p>
         </fieldset>
+
+        <p class="field-hint">Deixe a taxa de um produto em branco para removê-lo da comparação.</p>
 
         <button type="submit" class="btn-primary">Simular</button>
       </form>
@@ -91,17 +93,17 @@
       <h2>Resultado da simulação</h2>
 
       <div class="cards">
-        <div class="card card-pos">
+        <div class="card card-pos" id="cardPos">
           <span class="card-label" id="posLabel">Pós-fixado (CDI)</span>
           <strong class="card-value" id="posLiquido">—</strong>
           <span class="card-sub" id="posBruto">—</span>
         </div>
-        <div class="card card-pre">
+        <div class="card card-pre" id="cardPre">
           <span class="card-label" id="preLabel">Prefixado</span>
           <strong class="card-value" id="preLiquido">—</strong>
           <span class="card-sub" id="preBruto">—</span>
         </div>
-        <div class="card card-poup">
+        <div class="card card-poup" id="cardPoup">
           <span class="card-label">Poupança</span>
           <strong class="card-value" id="poupLiquido">—</strong>
           <span class="card-sub">Sempre isenta de IR</span>
@@ -112,16 +114,16 @@
 
       <div class="destaque-poupanca" id="destaquePoupanca"></div>
 
-      <div class="chart-container">
+      <div class="chart-container" id="chartContainer">
         <canvas id="chart" width="800" height="360"></canvas>
         <div class="legend">
-          <span class="legend-item"><i class="dot dot-pos"></i>Pós-fixado (CDI)</span>
-          <span class="legend-item"><i class="dot dot-pre"></i>Prefixado</span>
-          <span class="legend-item"><i class="dot dot-poup"></i>Poupança</span>
+          <span class="legend-item" id="legendPos"><i class="dot dot-pos"></i>Pós-fixado (CDI)</span>
+          <span class="legend-item" id="legendPre"><i class="dot dot-pre"></i>Prefixado</span>
+          <span class="legend-item" id="legendPoup"><i class="dot dot-poup"></i>Poupança</span>
         </div>
       </div>
 
-      <p class="aviso-poupanca">
+      <p class="aviso-poupanca" id="avisoPoupanca">
         ⚠ Na poupança, o rendimento só é creditado na data de aniversário mensal do depósito.
         Resgates antes de completar o ciclo de 30 dias perdem 100% do rendimento daquele período —
         um risco de liquidez que os outros produtos simulados aqui normalmente não têm.
